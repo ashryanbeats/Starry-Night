@@ -13,15 +13,10 @@ app.controller('HomeController', function($scope, $http, $firebaseObject) {
   var tool = new Tool();
   var drawingRef = new Firebase("https://whereyourdrawinggetslost.firebaseio.com");
   var drawing = $firebaseObject(drawingRef);
-  // drawing.foo = "bar";
+
   $scope.drawTogether = drawing;
-  //load drawings
 
-  // drawing.$save().then(function (drawingRef) {
-  //   console.log('hello');
-  // });
-
-  // drawing.$bindTo($scope, "drawTogether");
+  drawing.$bindTo($scope, "drawTogether");
 
   $scope.msgFromScope = "Try drawing something here!";
   
