@@ -1,0 +1,18 @@
+* {
+  box-sizing: border-box; }
+
+.navbar {
+  border-radius: 0; }
+
+#home blockquote {
+  font-size: 14px;
+  font-style: italic; }
+
+#home #myCanvas {
+  border: 3px solid white;
+  background-color: black;
+  height: 100%;
+  width: 100%; }
+
+#home .btn {
+  float: right; }
