@@ -1,5 +1,7 @@
 var express = require('express');
 var app = express();
+var server = require('http').Server(app)
+var io = require('socket.io')(server)
 var path = require('path');
 var logger = require('morgan');
 var chalk = require('chalk');
@@ -62,10 +64,16 @@ var startApp = function() {
   });
 };
 
+io.on('connection', function(socket) {
+    socket.on('sendCircle', function(data) {
+      socket.emit('gotIt', {data: 'I got it'})
+      console.log('this is data from sendCircle', data);
+    })
+})
+
 var startServer = function() {
   var port = 4545;
-
-  app.listen(port, function() {
+  server.listen(port, function() {
     console.log('The server is listening on port', chalk.green.bold(port), 'and loves you very much.');
   });
   
@@ -73,5 +81,6 @@ var startServer = function() {
 
 module.exports = {
   startApp: startApp,
-  startServer: startServer
+  startServer: startServer,
+  server: server
 };

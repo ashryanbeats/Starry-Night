@@ -1,4 +1,5 @@
 app.controller('HomeController', function($scope, $http, $firebaseArray) {
+  var socket = io();
 
   function initiate () { 
     console.log('initiated!');
@@ -29,19 +30,23 @@ app.controller('HomeController', function($scope, $http, $firebaseArray) {
     // adding 1 to its hue:
     myCircle.fillColor.hue += 1;
 
-    var vector = destination - myCircle.position;
+    // var vector = destination - myCircle.position;
 
-    myCircle.position += vector / 30;
+    // myCircle.position += vector / 30;
 
-    myCircle.content = Math.round(vector.length);
+    // myCircle.content = Math.round(vector.length);
 
-    if(vector.length < 5) {
+    // if(vector.length < 5) {
 
-      destination = Point.random() * view.size;
-    }
+    //   destination = Point.random() * view.size;
+    // }
 
-    
+    socket.emit('sendCircle', myCircle);
   }
+
+  socket.on('gotIt', function(data) {
+    console.log('jfkdlasjfdsklfjaslfjdkjf DATTATA', data);
+  })
 
   // tool.onMouseDown = function onMouseDown (event) {
   //   drag = true;
