@@ -1,5 +1,6 @@
 var router = require('express').Router();
-var path = require('path');
+var bodyParser = require('body-parser');
+// var path = require('path');
 
 router.get('/', function(req, res, next) {
   res.send('hello');
