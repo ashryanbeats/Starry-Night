@@ -13,9 +13,6 @@ app.controller('HomeController', function($scope, $http, $firebaseArray) {
   // var drawingRef = new Firebase("https://whereyourdrawinggetslost.firebaseio.com");
   // var drawing = $firebaseArray(drawingRef);
 
-  $scope.msgFromScope = "Try drawing something here!";
-
-
   var moon = new Path.Circle({
     position: view.center,
     radius: 30,
@@ -32,17 +29,33 @@ app.controller('HomeController', function($scope, $http, $firebaseArray) {
   var radius1 = 5;
   var radius2 = 10;
   var star = new Path.Star(center, points, radius1, radius2);
-  star.fillColor = 'yellow';
-  star.opacity = 0.7;
-
-  var count = 50;
-
-  view.onFrame = function (event) {
-    star.fillColor.hue += 1;
-    star.rotate(0.1);
+  
+  // star.fillColor = 'yellow';
+  star.style = {
+    fillColor: 'yellow',
+    opacity: 0.7
   }
 
+  var starArr = [];
+  for (var i = 0; i < 150; i++) {
+    var starCopy = star.clone();
+    var randomPosition = Point.random();
+    randomPosition.x = randomPosition.x * view.size._width;
+    randomPosition.y = randomPosition.y * view.size._height;
+    starCopy.position = randomPosition;
+    starCopy.rotate(Math.random() * 360);
+    starCopy.scale(0.25 + Math.random() * 0.75);
+    starArr.push(starCopy);
+  }
 
+  star.remove();
+
+  view.onFrame = function (event) {
+    for(var i = 0; i < starArr.length; i++) {
+      starArr[i].fillColor.hue +=  (1 - Math.round(Math.random()) * 2) * (Math.random() * 4);
+      starArr[i].rotate(Math.random());
+    }
+  }
 
   socket.emit('sendtheNight', project);
 
