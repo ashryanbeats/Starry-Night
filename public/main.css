@@ -1,8 +1,11 @@
 * {
   box-sizing: border-box; }
 
-.navbar {
+#navbar .navbar {
   border-radius: 0; }
+
+#navbar a {
+  font-family: 'Princess Sofia', cursive; }
 
 #home blockquote {
   font-size: 14px;
@@ -16,3 +19,6 @@
 
 #home .btn {
   float: right; }
+
+#home h1 {
+  font-family: 'Princess Sofia', cursive; }

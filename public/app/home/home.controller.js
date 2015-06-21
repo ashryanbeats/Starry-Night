@@ -19,7 +19,6 @@ app.controller('HomeController', function($scope, $http, $firebaseArray) {
   var stroke;
 
   tool.onMouseDown = function (event) {
-    console.log('entering mouseDown')
     stroke = new Path();
     stroke.fillColor = {
       hue: Math.random() * 360,
@@ -30,14 +29,11 @@ app.controller('HomeController', function($scope, $http, $firebaseArray) {
   }
 
   tool.onMouseDrag = function (event) {
-    console.log('entering mouseDrag')
     var step = event.delta.divide(2)
     step.angle += 90;
 
     var top = event.middlePoint.add(step);
     var bottom = event.middlePoint.subtract(step);
-
-    console.log('this is top', top);
 
     stroke.add(top);
     stroke.insert(0, bottom);
@@ -46,7 +42,6 @@ app.controller('HomeController', function($scope, $http, $firebaseArray) {
 
 
   tool.onMouseUp = function (event) {
-    console.log('entering mouseUp')
     stroke.add(event.point);
     stroke.closed = true;
     stroke.smooth();
@@ -57,11 +52,12 @@ app.controller('HomeController', function($scope, $http, $firebaseArray) {
     center: new Point(50, 50),
     radius: 30,
     fillColor: 'yellow',
+    opacity: 0.7
   });
 
-  moon.removeSegment(2);
-  moon.smooth();
-  moon.rotate(-40);
+  // moon.removeSegment(2);
+  // moon.smooth();
+  // moon.rotate(-40);
 
   // var center = new Point(50, 50);
   var center = view.center;
@@ -91,20 +87,20 @@ app.controller('HomeController', function($scope, $http, $firebaseArray) {
 
   star.remove();
 
-  var destination = Point.random();
+  var randomPosition2 = Point.random();
+  randomPosition2.x = randomPosition2.x * view.size._width;
+  randomPosition2.y = randomPosition2.y * view.size._height;
+  var destination = randomPosition2;
   console.log('this is destination', destination);
 
   view.onFrame = function (event) {
     for(var i = 0; i < starArr.length; i++) {
       starArr[i].fillColor.hue +=  (1 - Math.round(Math.random()) * 2) * (Math.random() * 5);
       starArr[i].rotate(Math.random());
-      
-      // var eachStar = starArr[i];
-      // var vector = destination - eachStar.position;
-      // starArr[i].position += vector / 30;
-      // if (vector.length < 5) {
-      //   destination = Point.random() * view.size;
-      // }
+      starArr[i].position.x += starArr[i].bounds.width / 500;
+      if (starArr[i].bounds.left > view.size.width) {
+        starArr[i].position.x = -starArr[i].bounds.width;
+      }
     }
   }
 
