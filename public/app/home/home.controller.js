@@ -15,49 +15,39 @@ app.controller('HomeController', function($scope, $http, $firebaseArray) {
 
   $scope.msgFromScope = "Try drawing something here!";
 
-  // var myCircle = new Path.Circle(new Point(100, 70), 50);
 
-  var myCircle = new Path.Circle({
-    center: view.center,
+  var moon = new Path.Circle({
+    position: view.center,
     radius: 30,
-    fillColor: 'red'
+    fillColor: 'yellow',
   });
 
-  var destination = Point.random() * view.size;
+  moon.removeSegment(2);
+  moon.smooth();
+  moon.rotate(-30);
+
+
+  var center = new Point(50, 50);
+  var points = 5;
+  var radius1 = 5;
+  var radius2 = 10;
+  var star = new Path.Star(center, points, radius1, radius2);
+  star.fillColor = 'yellow';
+  star.opacity = 0.7;
+
+  var count = 50;
 
   view.onFrame = function (event) {
-    // Each frame, change the fill color of the path slightly by
-    // adding 1 to its hue:
-    myCircle.fillColor.hue += 1;
-
-    // var vector = destination - myCircle.position;
-
-    // myCircle.position += vector / 30;
-
-    // myCircle.content = Math.round(vector.length);
-
-    // if(vector.length < 5) {
-
-    //   destination = Point.random() * view.size;
-    // }
-
-    socket.emit('sendCircle', myCircle);
+    star.fillColor.hue += 1;
+    star.rotate(0.1);
   }
 
+
+
+  socket.emit('sendtheNight', project);
+
   socket.on('gotIt', function(data) {
-    console.log('jfkdlasjfdsklfjaslfjdkjf DATTATA', data);
+    console.log('yay', data);
   })
-
-  // tool.onMouseDown = function onMouseDown (event) {
-  //   drag = true;
-  // };
-  
-  // tool.onMouseDrag = function onMouseDrag (event) {  
-
-  // };
-
-  // tool.onMouseUp = function onMouseUp () {
-  //   drag = false;
-  // };
 
 });

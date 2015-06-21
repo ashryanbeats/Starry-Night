@@ -65,9 +65,9 @@ var startApp = function() {
 };
 
 io.on('connection', function(socket) {
-    socket.on('sendCircle', function(data) {
+    socket.on('sendtheNight', function(data) {
       socket.emit('gotIt', {data: 'I got it'})
-      console.log('this is data from sendCircle', data);
+      console.log('this is data from sendtheNight', data);
     })
 })
 
