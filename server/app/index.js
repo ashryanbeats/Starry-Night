@@ -81,12 +81,17 @@ io.on('connection', function(socket) {
 
     // SAM NOTE:
     // meDrawing event should not be nested from sendtheNight. It is an unique event that needs to be watched separately 
-    socket.on('meDrawing', function(data) {
-        console.log('meDrawing', data);
-        // SAM NOTE:
-        // emits this following event to every socket except the socket who sent the "sendtheNight" event
-        socket.broadcast.emit('friendsDrawing', data);
-    });
+    // socket.on('meDrawing', function(data) {
+    //     console.log('meDrawing', data);
+    //     // SAM NOTE:
+    //     // emits this following event to every socket except the socket who sent the "sendtheNight" event
+    //     socket.broadcast.emit('friendsDrawing', data);
+    // });
+
+    socket.on('clearingTheSky', function(data) {
+        console.log('clearingTheSky', data);
+        socket.broadcast.emit('friendsClearing', data);
+    });    
 })
 
 var startServer = function() {
