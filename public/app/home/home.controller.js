@@ -1,67 +1,65 @@
 app.controller('HomeController', function($scope, $http) {
   var socket = io();
-  
   function initiate () { 
     console.log('initiated!');
     paper.install(window);
     paper.setup("myCanvas");
   };
-
   initiate();
 
-  //Drawing on the night sky
-  // var tool = new Tool();
+  // Drawing on the night sky
+  var tool = new Tool();
 
-  // var stroke;
-  // var path_to_send = {};
+  var stroke;
+  var path_to_send = {};
 
-  // tool.onMouseDown = function (event) {
-  //   stroke = new Path();
-  //   stroke.fillColor = {
-  //     hue: Math.random() * 360,
-  //     saturation: 1,
-  //     brightness: 1
-  //   };
-  //   stroke.add(event.point);
+  tool.onMouseDown = function (event) {
+    stroke = new Path();
+    stroke.fillColor = {
+      hue: Math.random() * 360,
+      saturation: 1,
+      brightness: 1
+    };
+    stroke.add(event.point);
 
-  // //defining what to send via sockets
-  //   path_to_send = {
-  //     color: stroke.fillColor,
-  //     start: event.point,
-  //     stroke: []
-  //   }
-  // }
+  //defining what to send via sockets
+    path_to_send = {
+      color: stroke.fillColor,
+      start: event.point,
+      stroke: []
+    };
+  };
 
-  // tool.onMouseDrag = function (event) {
-  //   var step = event.delta.divide(2)
-  //   step.angle += 90;
+  tool.onMouseDrag = function (event) {
+    var step = event.delta.divide(2)
+    step.angle += 90;
 
-  //   var top = event.middlePoint.add(step);
-  //   var bottom = event.middlePoint.subtract(step);
+    var top = event.middlePoint.add(step);
+    var bottom = event.middlePoint.subtract(step);
 
-  //   stroke.add(top);
-  //   stroke.insert(0, bottom);
-  //   stroke.smooth();
+    stroke.add(top);
+    stroke.insert(0, bottom);
+    stroke.smooth();
 
-  //   path_to_send.stroke.push({
-  //     top: top,
-  //     bottom: bottom
-  //   });
+    path_to_send.stroke.push({
+      top: top,
+      bottom: bottom
+    });
 
-  //   //emitting my drawing
-  //   socket.emit('meDrawing', JSON.stringify(path_to_send));
-  // }
+    //emitting my drawing
+    socket.emit('meDrawing', JSON.stringify(path_to_send));
+  }
 
-  // tool.onMouseUp = function (event) {
-  //   stroke.add(event.point);
-  //   stroke.closed = true;
-  //   stroke.smooth();
-  // }
+  tool.onMouseUp = function (event) {
+    stroke.add(event.point);
+    stroke.closed = true;
+    stroke.smooth();
+  }
 
-  // // When someone else starts drawing
-  // socket.on('friendsDrawing', function(data) {
-  //     console.log('friendsDrawing',JSON.parse(data));
-  // });
+  // When someone else starts drawing
+  socket.on('friendsDrawing', function(data) {
+      console.log('friendsDrawing', JSON.parse(data));
+  });
 
 
   //referencing https://github.com/byrichardpowell/draw/blob/master/public/javascripts/canvas.js
@@ -100,13 +98,6 @@ app.controller('HomeController', function($scope, $http) {
   //view.update called in socket listener
   //might conflict with the progress_external_path from above
 
-  // socket.on('friendsDrawing', function(data) {
-  //   JSON.parse(data);
-  //   view.update();
-  // });
-
-
-
 
   //Putting stars on the night sky
   var center = view.center;
@@ -140,7 +131,7 @@ app.controller('HomeController', function($scope, $http) {
     for(var i = 0; i < starArr.length; i++) {
       starArr[i].fillColor.hue +=  (1 - Math.round(Math.random()) * 2) * (Math.random() * 5);
       starArr[i].rotate(Math.random());
-      starArr[i].position.x += starArr[i].bounds.width / 500;
+      starArr[i].position.x += starArr[i].bounds.width / 200;
       if (starArr[i].bounds.left > view.size.width) {
         starArr[i].position.x = -starArr[i].bounds.width;
       }
@@ -148,68 +139,64 @@ app.controller('HomeController', function($scope, $http) {
   }
 
 
-  var blackSquare = Path.Rectangle(new Point(0,0), new Size(view.size._width,view.size._height));
-  blackSquare.fillColor = 'black';
-  blackSquare.opacity = 0.85;
-  //#1. existing starry sky is kept where it doesn't overlap the blackCover
-  // blackSquare.blendMode = 'destination-out';
+  // var blackSquare = Path.Rectangle(new Point(0,0), new Size(view.size._width,view.size._height));
+  // blackSquare.fillColor = 'yellow';
+  // blackSquare.opacity = 0.85;
+  // blackSquare = new Layer();
 
-  var blackCover = new Layer({
-    children: blackSquare
-  });
+  // //creating new tool to clear the night sky or "erase" the blackCover on a path
+  // var tool2 = new Tool();
 
-  //#2. creating new tool to clear the night sky or "erase" the blackCover on a path
-  var tool2 = new Tool();
+  // var stroke2;
+  // var path_to_send2 = {};
 
-  var stroke2;
-  var path_to_send2 = {};
+  // // project.layers[1].insertChild(0, stroke2);
+  // tool2.onMouseDown = function (event) {
+  //   stroke2 = new Path();
+  //   stroke2.fillColor = 'green'; //the color does not affect the functionality
+  //   stroke2.opacity = 1;
+  //   stroke2.strokeWidth = 20;
+  //   // stroke2.blendMode = 'destination-out'; //conflicts with stroke2.fillColor
+  //   stroke2.add(event.point);
+  // // //defining what to send via sockets
+  //   path_to_send2 = {
+  //     color: stroke2.fillColor,
+  //     start: event.point,
+  //     stroke2: []
+  //   }
+  // }
 
-  tool2.onMouseDown = function (event) {
-    stroke2 = new Path();
-    stroke2.fillColor = {
-      hue: Math.random() * 360
-    };
-    stroke2.strokeWidth = 20;
-    stroke2.blendMode = 'destination-out';
-    stroke2.add(event.point);
+  // tool2.onMouseDrag = function (event) {
+  //   var step = event.delta.divide(2)
+  //   step.angle += 90;
 
-  // //defining what to send via sockets
-    path_to_send2 = {
-      color: stroke2.fillColor,
-      start: event.point,
-      stroke2: []
-    }
-  }
+  //   var top = event.middlePoint.add(step);
+  //   var bottom = event.middlePoint.subtract(step);
 
-  tool2.onMouseDrag = function (event) {
-    var step = event.delta.divide(2)
-    step.angle += 90;
+  //   stroke2.add(top);
+  //   stroke2.insert(0, bottom);
+  //   stroke2.smooth();
 
-    var top = event.middlePoint.add(step);
-    var bottom = event.middlePoint.subtract(step);
+  //   path_to_send2.stroke2.push({
+  //     top: top,
+  //     bottom: bottom
+  //   });
 
-    stroke2.blendMode = 'destination-out';
-    stroke2.add(top);
-    stroke2.insert(0, bottom);
-    stroke2.smooth();
+  //   //emitting my drawing
+  //   socket.emit('clearingTheSky', JSON.stringify(path_to_send2));
+  // }
 
-    path_to_send2.stroke2.push({
-      top: top,
-      bottom: bottom
-    });
+  // tool2.onMouseUp = function (event) {
+  //   stroke2.add(event.point);
+  //   stroke2.closed = true;
+  //   stroke2.smooth();
+  // }
+  
+  // socket.on('friendsSendingtheNight', function(data) {
+  //     console.log('friendsSendingtheNight', JSON.parse(data));
+  // });
 
-    //emitting my drawing
-    socket.emit('clearingTheSky', JSON.stringify(path_to_send2));
-  }
-
-  tool2.onMouseUp = function (event) {
-    stroke2.add(event.point);
-    stroke2.closed = true;
-    stroke2.smooth();
-  }
-
-  //project refers the work done on the canvas  
-  console.log('this is the project', project);
+  //project refers the work done on the canvas
   socket.emit('sendtheNight', project);
   // exporting functions to use in server/app/index.js
   // module.exports = progress_external_path;

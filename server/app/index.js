@@ -71,7 +71,7 @@ io.on('connection', function(socket) {
     console.log('connected', socket.id);
     //listening to the night sky with stars
     socket.on('sendtheNight', function(data) {
-      console.log('this is the starry night', data);
+      console.log('this is the starry night', data)
       // //listening to my drawing
       // socket.on('meDrawing', function(data) {
       //   //listening to everyone drawing except me
@@ -81,18 +81,20 @@ io.on('connection', function(socket) {
 
     // SAM NOTE:
     // meDrawing event should not be nested from sendtheNight. It is an unique event that needs to be watched separately 
-    // socket.on('meDrawing', function(data) {
-    //     console.log('meDrawing', data);
+    socket.on('meDrawing', function(data) {
+        console.log('meDrawing', data);
     //     // SAM NOTE:
     //     // emits this following event to every socket except the socket who sent the "sendtheNight" event
-    //     socket.broadcast.emit('friendsDrawing', data);
-    // });
+        socket.broadcast.emit('friendsDrawing', data);
+    });
 
-    socket.on('clearingTheSky', function(data) {
-        console.log('clearingTheSky', data);
-        socket.broadcast.emit('friendsClearing', data);
-    });    
-})
+    //listening to me clearing the sky
+    // socket.on('clearingTheSky', function(data) {
+    //     console.log('clearingTheSky', data);
+    //listening to other people clearing the sky
+    //     socket.broadcast.emit('friendsClearing', data);
+    // });    
+});
 
 var startServer = function() {
   var port = 4545;
