@@ -75,11 +75,8 @@ io.on('connection', function(socket) {
         socket.broadcast.emit('friendsDrawing', data);
     });
 
-    // listening to me clear the sky
     socket.on('clearingTheSky', function(data) {
-        console.log('clearingTheSky', data);
-    // listening to friends clear the sky
-        // socket.broadcast.emit('friendsClearing', data);
+        socket.broadcast.emit('friendsClearing', data);
     });    
 });
 
