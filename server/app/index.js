@@ -69,14 +69,19 @@ io.on('connection', function(socket) {
     console.log('connected', socket.id);
     //listening to the night sky with stars
     socket.on('sendtheNight', function(data) {
-      console.log('this is the starry night', data)
     });
 
     socket.on('meDrawing', function(data) {
-        console.log('meDrawing', data);
         socket.broadcast.emit('friendsDrawing', data);
     });
-})
+
+    // listening to me clear the sky
+    socket.on('clearingTheSky', function(data) {
+        console.log('clearingTheSky', data);
+    // listening to friends clear the sky
+        // socket.broadcast.emit('friendsClearing', data);
+    });    
+});
 
 var startServer = function() {
   var port = 4545;
