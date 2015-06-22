@@ -114,8 +114,79 @@ app.controller('HomeController', function($scope, $http) {
       }
     }
   }
-
+  
   //project refers the work done on the canvas
+
+  // a foggy night sky
+  // var blackSquare = Path.Rectangle(new Point(0,0), new Size(view.size._width,view.size._height));
+  // blackSquare.fillColor = 'black';
+  // blackSquare.opacity = 0.85;
+  // blackSquare = new Layer();
+
+
+  // tool.remove();
+  // tool.activate(); //does not work
+
+  // creating new tool to clear the fog or "erase" the blackCover on a path
+  var tool2 = new Tool();
+
+  var stroke2;
+  var path_to_send2 = {};
+
+  tool2.onMouseDown = function (event) {
+    stroke2 = new Path();
+    stroke2.fillColor = 'green'; //the color does not affect the functionality
+    stroke2.opacity = 1;
+    stroke2.strokeWidth = 20;
+    stroke2.blendMode = 'destination-out'; //conflicts with stroke2.fillColor
+    stroke2.add(event.point);
+  // defining what to send via sockets
+    path_to_send2 = {
+      color: stroke2.fillColor,
+      start: event.point,
+      stroke2: []
+    }
+  }
+
+  tool2.onMouseDrag = function (event) {
+    var step = event.delta.divide(2)
+    step.angle += 90;
+
+    var top = event.middlePoint.add(step);
+    var bottom = event.middlePoint.subtract(step);
+
+    stroke2.add(top);
+    stroke2.insert(0, bottom);
+    stroke2.smooth();
+
+    path_to_send2.stroke2.push({
+      top: top,
+      bottom: bottom
+    });
+
+    //emitting my drawing
+    socket.emit('clearingTheSky', JSON.stringify(path_to_send2));
+  }
+
+  tool2.onMouseUp = function (event) {
+    stroke2.add(event.point);
+    stroke2.closed = true;
+    stroke2.smooth();
+  }
+
+  var drawingTools = [tool, tool2];
+
+  $scope.erase = function () {
+    drawingTools[1].activate();
+  }
+
+  $scope.decorate = function () {
+    drawingTools[0].activate();
+  }
+
   socket.emit('sendtheNight', project);
+  // socket.on('friendsClearing', function(data) {
+  //   console.log('friendsClearing', JSON.parse(data));
+  // })
 
 });
