@@ -15,7 +15,7 @@ app.controller('HomeController', function($scope, $http) {
   tool.maxDistance = 45;
 
   var stroke;
-  // var path_to_send = {};
+  var path_to_send = {};
 
   tool.onMouseDown = function (event) {
     stroke = new Path();
@@ -27,11 +27,11 @@ app.controller('HomeController', function($scope, $http) {
     stroke.add(event.point);
 
   //defining what to send via sockets
-    // path_to_send = {
-    //   color: stroke.fillColor,
-    //   start: event.point,
-    //   stroke: []
-    // }
+    path_to_send = {
+      color: stroke.fillColor,
+      start: event.point,
+      stroke: []
+    }
   }
 
   tool.onMouseDrag = function (event) {
@@ -45,21 +45,25 @@ app.controller('HomeController', function($scope, $http) {
     stroke.insert(0, bottom);
     stroke.smooth();
 
-    // path_to_send.stroke.push({
-    //   top: top,
-    //   bottom: bottom
-    // });
+    path_to_send.stroke.push({
+      top: top,
+      bottom: bottom
+    });
 
-  //emitting my drawing
-    // socket.emit('meDrawing', JSON.stringify(path_to_send));
+    //emitting my drawing
+    socket.emit('meDrawing', JSON.stringify(path_to_send));
   }
-
 
   tool.onMouseUp = function (event) {
     stroke.add(event.point);
     stroke.closed = true;
     stroke.smooth();
   }
+
+  // When someone else starts drawing
+  socket.on('friendsDrawing', function(data) {
+      console.log('friendsDrawing',JSON.parse(data));
+  });
 
 
   //referencing https://github.com/byrichardpowell/draw/blob/master/public/javascripts/canvas.js
@@ -150,5 +154,4 @@ app.controller('HomeController', function($scope, $http) {
   socket.emit('sendtheNight', project);
   // exporting functions to use in server/app/index.js
   // module.exports = progress_external_path;
-
 });

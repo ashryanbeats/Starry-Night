@@ -77,7 +77,16 @@ io.on('connection', function(socket) {
       //   //listening to everyone drawing except me
       //   socket.broadcast.emit('friendsDrawing', drawPath(JSON.stringify(data)));
       // })
-    })
+    });
+
+    // SAM NOTE:
+    // meDrawing event should not be nested from sendtheNight. It is an unique event that needs to be watched separately 
+    socket.on('meDrawing', function(data) {
+        console.log('meDrawing', data);
+        // SAM NOTE:
+        // emits this following event to every socket except the socket who sent the "sendtheNight" event
+        socket.broadcast.emit('friendsDrawing', data);
+    });
 })
 
 var startServer = function() {
