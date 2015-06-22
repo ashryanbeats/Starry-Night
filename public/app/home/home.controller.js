@@ -55,7 +55,7 @@ app.controller('HomeController', function($scope, $http) {
     stroke.smooth();
   }
 
-  // When someone else starts drawing
+  // When friends start drawing
   socket.on('friendsDrawing', function(data) {
       console.log('friendsDrawing', JSON.parse(data));
       var stroke2 = new Path();
@@ -130,21 +130,22 @@ app.controller('HomeController', function($scope, $http) {
   // creating new tool to clear the fog or "erase" the blackCover on a path
   var tool2 = new Tool();
 
-  var stroke2;
+  var stroke3;
   var path_to_send2 = {};
 
   tool2.onMouseDown = function (event) {
-    stroke2 = new Path();
-    stroke2.fillColor = 'green'; //the color does not affect the functionality
-    stroke2.opacity = 1;
-    stroke2.strokeWidth = 20;
-    stroke2.blendMode = 'destination-out'; //conflicts with stroke2.fillColor
-    stroke2.add(event.point);
+    stroke3 = new Path();
+    stroke3.fillColor = 'green'; //the color does not affect the functionality
+    stroke3.opacity = 1;
+    stroke3.strokeWidth = 20;
+    stroke3.blendMode = 'destination-out'; //conflicts with stroke2.fillColor
+    stroke3.add(event.point);
   // defining what to send via sockets
     path_to_send2 = {
-      color: stroke2.fillColor,
+      color: stroke3.fillColor,
       start: event.point,
-      stroke2: []
+      stroke3: [],
+      blendMode: stroke3.blendMode
     }
   }
 
@@ -155,11 +156,11 @@ app.controller('HomeController', function($scope, $http) {
     var top = event.middlePoint.add(step);
     var bottom = event.middlePoint.subtract(step);
 
-    stroke2.add(top);
-    stroke2.insert(0, bottom);
-    stroke2.smooth();
+    stroke3.add(top);
+    stroke3.insert(0, bottom);
+    stroke3.smooth();
 
-    path_to_send2.stroke2.push({
+    path_to_send2.stroke3.push({
       top: top,
       bottom: bottom
     });
@@ -169,13 +170,15 @@ app.controller('HomeController', function($scope, $http) {
   }
 
   tool2.onMouseUp = function (event) {
-    stroke2.add(event.point);
-    stroke2.closed = true;
-    stroke2.smooth();
+    stroke3.add(event.point);
+    stroke3.closed = true;
+    stroke3.smooth();
   }
 
   var drawingTools = [tool, tool2];
 
+
+  //erasing and decorating sky buttons
   $scope.erase = function () {
     drawingTools[1].activate();
   }
@@ -184,9 +187,29 @@ app.controller('HomeController', function($scope, $http) {
     drawingTools[0].activate();
   }
 
+  
+  //when friends start to clear the sky
+  socket.on('friendsClearing', function(data) {
+    console.log('friendClearing', JSON.parse(data));
+    var stroke4 = new Path();
+    var friendsClearing = JSON.parse(data);
+    var clearingStroke = friendsClearing.stroke3;
+    var start_clear_point = new Point(friendsClearing.start[1], friendsClearing.start[2])
+    var blendMode = friendsClearing.blendMode;
+    var color = friendsClearing.color
+    stroke4.blendMode = blendMode;
+    stroke4.fillColor = color;
+    stroke4.add(start_clear_point);
+    for(var i = 0; i < clearingStroke.length; i++) {
+      stroke4.add(new Point(clearingStroke[i].top[1], clearingStroke[i].top[2]));
+      stroke4.insert(0, new Point(clearingStroke[i].bottom[1], clearingStroke[i].bottom[2]));
+    }
+    stroke4.smooth();
+    view.draw();
+    view.update();  
+  });
+
+  //sending the night starry night
   socket.emit('sendtheNight', project);
-  // socket.on('friendsClearing', function(data) {
-  //   console.log('friendsClearing', JSON.parse(data));
-  // })
 
 });
