@@ -11,8 +11,6 @@ var publicPath = path.join(__dirname, '../../public');
 var indexHtmlPath = path.join(__dirname, '../index.html');
 var nodePath = path.join(__dirname, '../../node_modules');
 
-// var drawPath = require('../../public/app/home/home.controller.js')
-
 /* 
 Meaniscule doesn't use Bower by default. To use Bower,
 uncomment the following line and the related `app.use` line below.
@@ -78,13 +76,6 @@ io.on('connection', function(socket) {
         console.log('meDrawing', data);
         socket.broadcast.emit('friendsDrawing', data);
     });
-
-    //listening to me clearing the sky
-    // socket.on('clearingTheSky', function(data) {
-    //     console.log('clearingTheSky', data);
-    //listening to other people clearing the sky
-    //     socket.broadcast.emit('friendsClearing', data);
-    // });    
 })
 
 var startServer = function() {
