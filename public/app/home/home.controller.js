@@ -28,6 +28,7 @@ app.controller('HomeController', function($scope, $http) {
       start: event.point,
       stroke: []
     };
+    // console.log('this is event.point onMouseDown', event.point);
   };
 
   tool.onMouseDrag = function (event) {
@@ -45,7 +46,7 @@ app.controller('HomeController', function($scope, $http) {
       top: top,
       bottom: bottom
     });
-
+    // console.log('this is event.point onMouseDrag', event.point);
     //emitting my drawing
     socket.emit('meDrawing', JSON.stringify(path_to_send));
   }
@@ -59,40 +60,26 @@ app.controller('HomeController', function($scope, $http) {
   // When someone else starts drawing
   socket.on('friendsDrawing', function(data) {
       console.log('friendsDrawing', JSON.parse(data));
+      var stroke2 = new Path();
+      var friendsDrawing = JSON.parse(data);
+      var eachStroke = friendsDrawing.stroke;
+      var start_point = new Point(friendsDrawing.start[1], friendsDrawing.start[2])
+      var color = friendsDrawing.color
+      stroke2.fillColor = color;
+      stroke2.add(start_point);
+      for(var i = 0; i < eachStroke.length; i++) {
+        stroke2.add(new Point(eachStroke[i].top[1], eachStroke[i].top[2]));
+        stroke2.insert(0, new Point(eachStroke[i].bottom[1], eachStroke[i].bottom[2]));
+      }
+      stroke2.smooth();
+      console.log('here is stroke2', stroke2);
+      view.draw();
+      view.update();
   });
 
 
   //referencing https://github.com/byrichardpowell/draw/blob/master/public/javascripts/canvas.js
   //for drawing a path in real time
-
-  // var path = {}
-  // var progress_external_path = function(points) {
-
-  //   //if there is currently no path, start the path
-  //   if(!path) {
-  //     external_paths = new Path();
-  //     path = external_paths;
-
-  //   //starting the path
-  //     var start_point = new Point(points.start.x, points.start.y);
-  //     path.fillColor = {
-  //       hue: Math.random() * 360,
-  //       saturation: 1,
-  //       brightness: 1
-  //     };
-  //     path.add(start_point);      
-  //   }
-
-  //   var paths = points.path;
-
-  //   for(var i = 0; i < paths.length; i++) {
-  //     path.add(paths[i].top);
-  //     path.insert(0, paths[i].bottom);
-  //   }
-
-  //   path.smooth();
-  //   view.draw();
-  // }
 
   //referencing https://groups.google.com/forum/#!topic/paperjs/cmQFQNTVABg
   //view.update called in socket listener
@@ -100,6 +87,7 @@ app.controller('HomeController', function($scope, $http) {
 
 
   //Putting stars on the night sky
+
   var center = view.center;
   var points = 5;
   var radius1 = 5;
@@ -198,6 +186,9 @@ app.controller('HomeController', function($scope, $http) {
 
   //project refers the work done on the canvas
   socket.emit('sendtheNight', project);
+  // socket.on('friendSending', function(data) {
+  //   console.log('friendSending', JSON.parse(data));
+  // })
   // exporting functions to use in server/app/index.js
   // module.exports = progress_external_path;
 });
