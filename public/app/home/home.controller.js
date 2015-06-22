@@ -1,6 +1,6 @@
-app.controller('HomeController', function($scope, $http, $firebaseArray) {
+app.controller('HomeController', function($scope, $http) {
   var socket = io();
-
+  
   function initiate () { 
     console.log('initiated!');
     paper.install(window);
@@ -9,14 +9,13 @@ app.controller('HomeController', function($scope, $http, $firebaseArray) {
 
   initiate();
 
+  //Drawing on the night sky
   var tool = new Tool();
-  // var drawingRef = new Firebase("https://whereyourdrawinggetslost.firebaseio.com");
-  // var drawing = $firebaseArray(drawingRef);
-
   tool.minDistance = 10;
   tool.maxDistance = 45;
 
   var stroke;
+  // var path_to_send = {};
 
   tool.onMouseDown = function (event) {
     stroke = new Path();
@@ -26,6 +25,13 @@ app.controller('HomeController', function($scope, $http, $firebaseArray) {
       brightness: 1
     };
     stroke.add(event.point);
+
+  //defining what to send via sockets
+    // path_to_send = {
+    //   color: stroke.fillColor,
+    //   start: event.point,
+    //   stroke: []
+    // }
   }
 
   tool.onMouseDrag = function (event) {
@@ -38,6 +44,14 @@ app.controller('HomeController', function($scope, $http, $firebaseArray) {
     stroke.add(top);
     stroke.insert(0, bottom);
     stroke.smooth();
+
+    // path_to_send.stroke.push({
+    //   top: top,
+    //   bottom: bottom
+    // });
+
+  //emitting my drawing
+    // socket.emit('meDrawing', JSON.stringify(path_to_send));
   }
 
 
@@ -48,18 +62,51 @@ app.controller('HomeController', function($scope, $http, $firebaseArray) {
   }
 
 
-  var moon = new Path.Circle({
-    center: new Point(50, 50),
-    radius: 30,
-    fillColor: 'yellow',
-    opacity: 0.7
-  });
+  //referencing https://github.com/byrichardpowell/draw/blob/master/public/javascripts/canvas.js
+  //for drawing a path in real time
 
-  // moon.removeSegment(2);
-  // moon.smooth();
-  // moon.rotate(-40);
+  // var path = {}
+  // var progress_external_path = function(points) {
 
-  // var center = new Point(50, 50);
+  //   //if there is currently no path, start the path
+  //   if(!path) {
+  //     external_paths = new Path();
+  //     path = external_paths;
+
+  //   //starting the path
+  //     var start_point = new Point(points.start.x, points.start.y);
+  //     path.fillColor = {
+  //       hue: Math.random() * 360,
+  //       saturation: 1,
+  //       brightness: 1
+  //     };
+  //     path.add(start_point);      
+  //   }
+
+  //   var paths = points.path;
+
+  //   for(var i = 0; i < paths.length; i++) {
+  //     path.add(paths[i].top);
+  //     path.insert(0, paths[i].bottom);
+  //   }
+
+  //   path.smooth();
+  //   view.draw();
+  // }
+
+  //referencing https://groups.google.com/forum/#!topic/paperjs/cmQFQNTVABg
+  //view.update called in socket listener
+  //might conflict with the progress_external_path from above
+
+  // socket.on('friendsDrawing', function(data) {
+  //   JSON.parse(data);
+  //   view.update();
+  // });
+
+
+
+
+  //Putting stars on the night sky
   var center = view.center;
   var points = 5;
   var radius1 = 5;
@@ -87,12 +134,6 @@ app.controller('HomeController', function($scope, $http, $firebaseArray) {
 
   star.remove();
 
-  var randomPosition2 = Point.random();
-  randomPosition2.x = randomPosition2.x * view.size._width;
-  randomPosition2.y = randomPosition2.y * view.size._height;
-  var destination = randomPosition2;
-  console.log('this is destination', destination);
-
   view.onFrame = function (event) {
     for(var i = 0; i < starArr.length; i++) {
       starArr[i].fillColor.hue +=  (1 - Math.round(Math.random()) * 2) * (Math.random() * 5);
@@ -104,10 +145,10 @@ app.controller('HomeController', function($scope, $http, $firebaseArray) {
     }
   }
 
+  //project refers the work done on the canvas  
+  console.log('this is the project', project);
   socket.emit('sendtheNight', project);
-
-  socket.on('gotIt', function(data) {
-    console.log('yay', data);
-  })
+  // exporting functions to use in server/app/index.js
+  // module.exports = progress_external_path;
 
 });

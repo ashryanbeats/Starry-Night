@@ -1,4 +1,4 @@
-var app = angular.module('Meaniscule', ['ui.router', 'firebase', 'hmTouchEvents']);
+var app = angular.module('Meaniscule', ['ui.router', 'firebase']);
 
 app.config(function ($urlRouterProvider, $locationProvider) {
    // This turns off hashbang urls (/#about) and changes it to something normal (/about)
