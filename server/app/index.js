@@ -61,7 +61,6 @@ var startApp = function() {
   //// Server issues
   app.use(function(err, req, res, next) {
     res.sendStatus(err.status || 500);
-
   });
 };
 
@@ -69,6 +68,7 @@ io.on('connection', function(socket) {
     console.log('connected', socket.id);
     //listening to the night sky with stars
     socket.on('sendtheNight', function(data) {
+        socket.broadcast.emit('friendsSending', data);
     });
 
     socket.on('meDrawing', function(data) {
@@ -77,7 +77,7 @@ io.on('connection', function(socket) {
 
     socket.on('clearingTheSky', function(data) {
         socket.broadcast.emit('friendsClearing', data);
-    });    
+    });
 });
 
 var startServer = function() {

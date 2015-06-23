@@ -1,5 +1,4 @@
 app.controller('HomeController', function($scope, $http) {
-
   //Initiating socket
   var socket = io();
 
@@ -12,44 +11,50 @@ app.controller('HomeController', function($scope, $http) {
   initiate();
 
   //Putting stars on the night sky
-
-  var center = view.center;
-  var points = 5;
-  var radius1 = 5;
-  var radius2 = 10;
-  var star = new Path.Star(center, points, radius1, radius2);
-  
-  star.style = {
-    fillColor: 'yellow'
-  }
-
-  var starArr = [];
-  for (var i = 0; i < 100; i++) {
-    var starCopy = star.clone();
-    var randomPosition = Point.random();
-    randomPosition.x = randomPosition.x * view.size._width;
-    randomPosition.y = randomPosition.y * view.size._height;
-    starCopy.position = randomPosition;
-    starCopy.rotate(Math.random() * 20);
-    starCopy.scale(0.25 + Math.random() * 0.75);
-    starCopy.onMouseMove = function(event) {
-      this.opacity = Math.random();
+  function stars () {
+    var center = view.center;
+    var points = 5;
+    var radius1 = 5;
+    var radius2 = 10;
+    var star = new Path.Star(center, points, radius1, radius2);
+    
+    star.style = {
+      fillColor: 'yellow'
     }
-    starArr.push(starCopy);
-  }
 
-  star.remove();
+    var starArr = [];
+    for (var i = 0; i < 100; i++) {
+      var starCopy = star.clone();
+      var randomPosition = Point.random();
+      randomPosition.x = randomPosition.x * view.size._width;
+      randomPosition.y = randomPosition.y * view.size._height;
+      starCopy.position = randomPosition;
+      starCopy.rotate(Math.random() * 20);
+      starCopy.scale(0.25 + Math.random() * 0.75);
+      starCopy.onMouseMove = function(event) {
+        this.opacity = Math.random();
+      }
+      starArr.push(starCopy);
+    }
 
-  view.onFrame = function (event) {
-    for(var i = 0; i < starArr.length; i++) {
-      starArr[i].fillColor.hue +=  (1 - Math.round(Math.random()) * 2) * (Math.random() * 5);
-      starArr[i].rotate(Math.random());
-      starArr[i].position.x += starArr[i].bounds.width / 200;
-      if (starArr[i].bounds.left > view.size.width) {
-        starArr[i].position.x = -starArr[i].bounds.width;
+    star.remove();
+
+    view.onFrame = function (event) {
+      for(var i = 0; i < starArr.length; i++) {
+        starArr[i].fillColor.hue +=  (1 - Math.round(Math.random()) * 2) * (Math.random() * 5);
+        starArr[i].rotate(Math.random());
+        starArr[i].position.x += starArr[i].bounds.width / 200;
+        if (starArr[i].bounds.left > view.size.width) {
+          starArr[i].position.x = -starArr[i].bounds.width;
+        }
       }
     }
-  }
+
+    socket.emit('sendtheNight', project.activeLayer);
+  };
+  
+  stars();
+  $scope.stars = stars
 
   // Drawing on the night sky
   var tool = new Tool();
@@ -99,11 +104,14 @@ app.controller('HomeController', function($scope, $http) {
     stroke.smooth();
   }
 
-  // a foggy night sky
-  // var blackSquare = Path.Rectangle(new Point(0,0), new Size(view.size._width,view.size._height));
-  // blackSquare.fillColor = 'black';
-  // blackSquare.opacity = 0.85;
-  // blackSquare = new Layer();
+  // a shadowy night sky
+  function shadow () {
+    var blackSquare = Path.Rectangle(new Point(0,0), new Size(view.size._width,view.size._height));
+    blackSquare.fillColor = 'black';
+    blackSquare.opacity = 0.2;
+  }
+
+  $scope.shadow = shadow;
 
   // creating new tool to "erase" or "clear" the sky
   var tool2 = new Tool();
@@ -169,8 +177,7 @@ app.controller('HomeController', function($scope, $http) {
 //socket events
 
   // When friends start drawing
-  socket.on('friendsDrawing', function(data) {
-      console.log('friendsDrawing', JSON.parse(data));
+  socket.on('friendsDrawing', function (data) {
       var stroke2 = new Path();
       var friendsDrawing = JSON.parse(data);
       var eachStroke = friendsDrawing.stroke;
@@ -183,14 +190,12 @@ app.controller('HomeController', function($scope, $http) {
         stroke2.insert(0, new Point(eachStroke[i].bottom[1], eachStroke[i].bottom[2]));
       }
       stroke2.smooth();
-      console.log('here is stroke2', stroke2);
       view.draw();
       view.update();
   });
   
   //when friends start to clear the sky
-  socket.on('friendsClearing', function(data) {
-    console.log('friendClearing', JSON.parse(data));
+  socket.on('friendsClearing', function (data) {
     var stroke4 = new Path();
     var friendsClearing = JSON.parse(data);
     var clearingStroke = friendsClearing.stroke3;
@@ -209,7 +214,13 @@ app.controller('HomeController', function($scope, $http) {
     view.update();  
   });
 
+  //when friends are also on the page, add 100 more stars to your view every minute
+  socket.on('friendsSending', function () {
+    window.setInterval(stars, 60000);
+    view.update();
+  })
+
   //sending the night starry night
-  socket.emit('sendtheNight', project);
+  // socket.emit('sendtheNight', project);
 
 });
