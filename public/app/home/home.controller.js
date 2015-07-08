@@ -1,4 +1,4 @@
-app.controller('HomeController', function($scope, $http) {
+app.controller('HomeController', function($scope) {
   //Initiating socket
   var socket = io();
 
@@ -103,15 +103,6 @@ app.controller('HomeController', function($scope, $http) {
     stroke.closed = true;
     stroke.smooth();
   }
-
-  // a shadowy night sky
-  function shadow () {
-    var blackSquare = Path.Rectangle(new Point(0,0), new Size(view.size._width,view.size._height));
-    blackSquare.fillColor = 'black';
-    blackSquare.opacity = 0.2;
-  }
-
-  $scope.shadow = shadow;
 
   // creating new tool to "erase" or "clear" the sky
   var tool2 = new Tool();

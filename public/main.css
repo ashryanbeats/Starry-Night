@@ -5,15 +5,14 @@
   border-radius: 0; }
 
 #navbar a {
-  font-family: 'Princess Sofia', cursive;
+  font-family: 'Ubuntu', sans-serif;
   font-size: 23px; }
 
 #home #myCanvas {
-  border: 3px solid white;
   background-color: black;
   height: 100%;
   width: 100%; }
 
 #home .btn {
-  font-family: 'Princess Sofia', cursive;
+  font-family: 'Ubuntu', sans-serif;
   font-size: 25px; }
